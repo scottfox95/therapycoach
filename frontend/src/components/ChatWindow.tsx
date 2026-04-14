@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import MessageBubble from './MessageBubble'
 import FileDropZone, { AttachedFile } from './FileDropZone'
 import DocumentPicker from './DocumentPicker'
+import MicButton from './MicButton'
+import { useSpeechToText } from '../hooks/useSpeechToText'
 
 interface ContextDocument {
   id: string
@@ -47,6 +49,12 @@ export default function ChatWindow({ sessionId, onSessionCreated, onSessionEnded
   const [contextExpanded, setContextExpanded] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleSpeechResult = useCallback((text: string) => {
+    setInput(prev => (prev ? `${prev} ${text}` : text))
+  }, [])
+  const { isListening, isSupported: isSpeechSupported, toggle: toggleSpeech } =
+    useSpeechToText({ onResult: handleSpeechResult })
 
   useEffect(() => {
     if (sessionId) {
@@ -390,12 +398,12 @@ export default function ChatWindow({ sessionId, onSessionCreated, onSessionEnded
               onKeyDown={handleKeyDown}
               placeholder={attachedFile ? "Add a message about this file..." : "Speak honestly..."}
               rows={1}
-              className="w-full bg-ink-800 border border-ink-600 rounded-lg pl-20 pr-12 py-4
+              className={`w-full bg-ink-800 border border-ink-600 rounded-lg pl-20 ${isSpeechSupported ? 'pr-20' : 'pr-12'} py-4
                          text-parchment-100 placeholder-parchment-300/50
                          font-body text-base leading-relaxed
                          resize-none transition-colors duration-200
                          focus:outline-none focus:border-ember-400/60
-                         hover:border-ink-600/80"
+                         hover:border-ink-600/80`}
             />
             {/* Document picker button — left of paperclip */}
             {!wrapUp && (
@@ -412,6 +420,14 @@ export default function ChatWindow({ sessionId, onSessionCreated, onSessionEnded
                     d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                 </svg>
               </button>
+            )}
+            {isSpeechSupported && !wrapUp && (
+              <MicButton
+                isListening={isListening}
+                onToggle={toggleSpeech}
+                disabled={isLoading}
+                className="absolute right-10 bottom-3"
+              />
             )}
             <button
               onClick={sendMessage}

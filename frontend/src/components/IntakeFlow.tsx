@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import MicButton from './MicButton'
+import { useSpeechToText } from '../hooks/useSpeechToText'
 
 interface IntakeMessage {
   role: 'user' | 'assistant'
@@ -19,6 +21,12 @@ export default function IntakeFlow({ onComplete }: IntakeFlowProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const openingRequested = useRef(false)
+
+  const handleSpeechResult = useCallback((text: string) => {
+    setInput(prev => (prev ? `${prev} ${text}` : text))
+  }, [])
+  const { isListening, isSupported: isSpeechSupported, toggle: toggleSpeech } =
+    useSpeechToText({ onResult: handleSpeechResult })
 
   useEffect(() => {
     if (openingRequested.current) return
@@ -202,14 +210,22 @@ export default function IntakeFlow({ onComplete }: IntakeFlowProps) {
               placeholder="Answer honestly — this shapes everything that follows…"
               rows={1}
               disabled={isLoading || isFinalizing}
-              className="w-full bg-ink-800 border border-ink-600 rounded-lg pl-4 pr-12 py-4
+              className={`w-full bg-ink-800 border border-ink-600 rounded-lg pl-4 ${isSpeechSupported ? 'pr-20' : 'pr-12'} py-4
                          text-parchment-100 placeholder-parchment-300/50
                          font-body text-base leading-relaxed
                          resize-none transition-colors duration-200
                          focus:outline-none focus:border-ember-400/60
                          hover:border-ink-600/80
-                         disabled:opacity-50"
+                         disabled:opacity-50`}
             />
+            {isSpeechSupported && (
+              <MicButton
+                isListening={isListening}
+                onToggle={toggleSpeech}
+                disabled={isLoading || isFinalizing}
+                className="absolute right-10 bottom-3"
+              />
+            )}
             <button
               onClick={sendMessage}
               disabled={!input.trim() || isLoading || isFinalizing}
