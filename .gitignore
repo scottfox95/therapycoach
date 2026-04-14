@@ -1,0 +1,48 @@
+# Environment — NEVER commit these, they contain API keys and DB credentials
+.env
+.env.local
+.env.*.local
+
+# Python
+.venv
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE & local tool configs
+.idea/
+.vscode/
+.claude/
+.cursor/
+
+# Personal — never publish
+profile_backups/
+*.m4a
+*.mp3
+*.wav
+*.mp4
+
+# Local notes / drafts
+Therapist_Summary_*.md
+Maria*.md
+ExampleConversation
+TherapyChatApp_Specification
+therapycoach_web_app_*.plan.md
+import_conversation.py
+=*
+Therapist_Summary_Scott.md

@@ -1,0 +1,16 @@
+{
+  "name": "therapycoach",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "python3 backend/start_server.py",
+    "frontend": "cd frontend && npm run dev",
+    "install": "cd frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
+
